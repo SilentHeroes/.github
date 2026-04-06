@@ -122,8 +122,13 @@ is_generic_false_positive() {
     return 0
   fi
 
-  # Skip lines that are clearly comments describing secrets (not actual secrets)
-  if echo "$match_text" | grep -qE '^[[:space:]]*(//|#|\*|/\*)[[:space:]].*(required|configured|set |needed|must|should|optional)'; then
+  # Skip commented-out lines (shell #, JS //, block /* *)
+  if echo "$match_text" | grep -qE '^[[:space:]]*(//|#|\*|/\*)'; then
+    return 0
+  fi
+
+  # Skip obvious placeholder values
+  if echo "$match_text" | grep -qEi '(your-|changeme|example|replace.me|xxx|TODO|FIXME|placeholder|<your)'; then
     return 0
   fi
 
